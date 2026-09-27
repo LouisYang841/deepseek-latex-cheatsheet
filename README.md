@@ -16,13 +16,14 @@
 
 **关键规则：一条公式只要混进一个 KaTeX 不认识的命令，整条都会落到 SVG 层**。玩花样时要么全用 KaTeX 层命令，要么整条全用 WASM 专属命令，不要混。
 
-## ❌ 实测禁区
+## ❌ 实测雷区
 
-以下写法静态判定能过，但实测会让整条公式渲染崩掉（MicroTeX WASM 没实现完整的文本段落断行引擎，一碰就死）：
+实测自 DeepSeek 页面（静态判定能过但会出事）：
 
-- `\parbox{4cm}{...}` 段落盒
-- `\begin{tabular}` 的 `p{4.5cm}` 列类型（改用 `l` / `c` / `r`，或 `*{n}{c}`）
-- `\hfill` 在非数学模式下单用
+- **命令级死穴**（WASM 裁剪宏包，渲染必崩）：`\parbox`、`\begin{tabular}` 的 `p{4.5cm}` 列、`\hfill`（非数学模式单用）、`\hdashline`、`\definecolor` 的 HTML 模式
+- **跨层混用**：KaTeX 专属命令（`\sout` `\cancel`）和 WASM 专属命令（`\overparen` `\ovalbox`）别写进同一个 `$$`——一旦整条降级，WASM 不认识 KaTeX 的命令，直接罢工（显示原文）
+- **嵌套 ≤ 3 层**：WASM 解析器内存极小，嵌套超三层（如 tabular → `\rowcolor` → `\shadowbox` → `\ovalbox`）会触发保护机制崩溃
+- **先定义后使用**：`\definecolor` 放独立公式块先定义，后续公式再用 `\bgcolor`；同一条公式内定义+立即使用 WASM 不认
 
 ## 清单规模
 
