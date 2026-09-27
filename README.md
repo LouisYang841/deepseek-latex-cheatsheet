@@ -14,16 +14,27 @@
 
 渲染管线：自研流式 markdown 解析器识别公式（支持打字机式输出下未闭合的 `$…$` / `\(…\)`）→ KaTeX `renderToString(value, { throwOnError: true, strict: false })` → 抛错则整条公式交给 MicroTeX WASM 以 SVG 重画 → 再失败显示原文并埋点上报。
 
+**WASM 的本质是几何盒子排版引擎**：图层堆叠、坐标变换、画框都极擅长（七层套娃无压力），但它不是文字处理软件——没有文字流断行引擎。这解释了下面为什么「自动换行」类命令全是死穴。
+
 **关键规则：一条公式只要混进一个 KaTeX 不认识的命令，整条都会落到 SVG 层**。玩花样时要么全用 KaTeX 层命令，要么整条全用 WASM 专属命令，不要混。
 
-## ❌ 实测雷区
+## ❌ 致命雷区（实测：崩溃原因高度集中，只有三类）
 
-实测自 DeepSeek 页面（静态判定能过但会出事）：
+**① 文本自动换行（最致命）**——`\parbox`、`\shortstack`、`\begin{tabular}` 的 `p{4.5cm}` 列：WASM 没有断行引擎，凡是要它「自动折行」必崩。唯一解法是 `\begin{array}` + `\\` 人工拆行。
 
-- **命令级死穴**（WASM 裁剪宏包，渲染必崩）：`\parbox`、`\begin{tabular}` 的 `p{4.5cm}` 列、`\hfill`（非数学模式单用）、`\hdashline`、`\definecolor` 的 HTML 模式
-- **跨层混用**：KaTeX 专属命令（`\sout` `\cancel`）和 WASM 专属命令（`\overparen` `\ovalbox`）别写进同一个 `$$`——一旦整条降级，WASM 不认识 KaTeX 的命令，直接罢工（显示原文）
-- **嵌套 ≤ 3 层**：WASM 解析器内存极小，嵌套超三层（如 tabular → `\rowcolor` → `\shadowbox` → `\ovalbox`）会触发保护机制崩溃
-- **先定义后使用**：`\definecolor` 放独立公式块先定义，后续公式再用 `\bgcolor`；同一条公式内定义+立即使用 WASM 不认
+**② 跨层混用**——KaTeX 专属命令（`\sout` `\cancel`）与 WASM 专属命令（`\overparen` `\ovalbox`）别写进同一个 `$$`：降级后 WASM 不认识 KaTeX 的命令，直接报错。解法是隔离原则：两层严格拆到独立公式块。
+
+**③ 零散残缺**——`\hfill` 非数学模式单用（用 array 的 `l`/`r` 列替代）；`\hdashline`（用 `\hline` 或 `\cline` 替代）；`\definecolor` 的 HTML 模式（用 rgb 浮点数或内置 dvips 色名替代）；同条公式内 `\definecolor` 后立即 `\bgcolor`（分块定义再调用）。
+
+## ✅ 黄金开发规范
+
+- **WASM 层管排版 UI**：`\ovalbox`（胶囊）`\shadowbox`（阴影）`\doublebox`（双线框）`\rotatebox`（旋转）`\scalebox`（缩放）`\reflectbox`（镜像）
+- **KaTeX 层管文本公式**：`\sout` `\ce{}` `\cancel`、基础数学符号
+- **安全底座**：`array`（分屏/对齐/多行）、`tabular`（状态面板，只用 `\hline`）
+- **颜色系统**：内置 dvips 色名（`wildstrawberry`、`periwinkle`）优先；自定义色用 `rgb{1.0,0.71,0.75}` 独立块定义
+- **排版哲学**：长文本必须人工拆解——所有让引擎自动换行的手段，全是死路
+
+> 实测：七层盒子套娃（`\reflectbox`→`\doublebox`→`\scalebox`→`\rotatebox`→`\shadowbox`→`\ovalbox`→`\colorbox`）完美渲染；tabular 单元格塞四层套娃也安全（只要不用 p{} 列）。**嵌套深度不是问题，文本自动换行才是唯一红线。**
 
 ## 清单规模
 
