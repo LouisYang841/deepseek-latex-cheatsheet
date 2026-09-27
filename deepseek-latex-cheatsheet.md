@@ -4,45 +4,53 @@
 
 标记说明：**[W]** = 仅 WASM 层支持（KaTeX 会报错，走 SVG 兜底）；无标记 = KaTeX 层直接支持。
 
+## ❌ 实测禁区（静态判定能过，渲染会崩）
+
+以下写法会让整条公式渲染失败——MicroTeX WASM 没实现完整的文本段落断行引擎，一碰就死：
+
+- `\parbox{4cm}{...}` 段落盒
+- `\begin{tabular}` 的 `p{4.5cm}` 列类型（改用 `l` / `c` / `r`，或 `*{n}{c}`）
+- `\hfill` 在非数学模式下单用
+
 ## 环境语法 `\begin{...}`
 
 | 环境 | KaTeX 层 | WASM 层 |
 |---|---|---|
-| `egin{Bmatrix}` | ✓ | ✓ |
-| `egin{Bmatrix*}` | ✓ | — |
-| `egin{Vmatrix}` | ✓ | ✓ |
-| `egin{Vmatrix*}` | ✓ | — |
-| `egin{align}` | ✓ | — |
-| `egin{align*}` | ✓ | — |
-| `egin{alignat}` | ✓ | ✓ |
-| `egin{aligned}` | ✓ | ✓ |
-| `egin{alignedat}` | ✓ | ✓ |
-| `egin{array}` | ✓ | ✓ |
-| `egin{bmatrix}` | ✓ | ✓ |
-| `egin{bmatrix*}` | ✓ | — |
-| `egin{cases}` | ✓ | — |
-| `egin{darray}` | ✓ | — |
-| `egin{dcases}` | ✓ | — |
-| `egin{displaymath} **[W]**` | — | ✓ |
-| `egin{drcases}` | ✓ | — |
-| `egin{equation}` | ✓ | — |
-| `egin{equation*}` | ✓ | — |
-| `egin{flalign} **[W]**` | — | ✓ |
-| `egin{gather}` | ✓ | ✓ |
-| `egin{gather*}` | ✓ | — |
-| `egin{gathered}` | ✓ | ✓ |
-| `egin{matrix}` | ✓ | — |
-| `egin{matrix*}` | ✓ | — |
-| `egin{multline} **[W]**` | — | ✓ |
-| `egin{pmatrix}` | ✓ | ✓ |
-| `egin{pmatrix*}` | ✓ | — |
-| `egin{rcases}` | ✓ | — |
-| `egin{smallmatrix}` | ✓ | ✓ |
-| `egin{smallmatrix*}` | ✓ | — |
-| `egin{split}` | ✓ | ✓ |
-| `egin{subarray}` | ✓ | — |
-| `egin{vmatrix}` | ✓ | ✓ |
-| `egin{vmatrix*}` | ✓ | — |
+| `\begin{Bmatrix}` | ✓ | ✓ |
+| `\begin{Bmatrix*}` | ✓ | — |
+| `\begin{Vmatrix}` | ✓ | ✓ |
+| `\begin{Vmatrix*}` | ✓ | — |
+| `\begin{align}` | ✓ | — |
+| `\begin{align*}` | ✓ | — |
+| `\begin{alignat}` | ✓ | ✓ |
+| `\begin{aligned}` | ✓ | ✓ |
+| `\begin{alignedat}` | ✓ | ✓ |
+| `\begin{array}` | ✓ | ✓ |
+| `\begin{bmatrix}` | ✓ | ✓ |
+| `\begin{bmatrix*}` | ✓ | — |
+| `\begin{cases}` | ✓ | — |
+| `\begin{darray}` | ✓ | — |
+| `\begin{dcases}` | ✓ | — |
+| `\begin{displaymath} **[W]**` | — | ✓ |
+| `\begin{drcases}` | ✓ | — |
+| `\begin{equation}` | ✓ | — |
+| `\begin{equation*}` | ✓ | — |
+| `\begin{flalign} **[W]**` | — | ✓ |
+| `\begin{gather}` | ✓ | ✓ |
+| `\begin{gather*}` | ✓ | — |
+| `\begin{gathered}` | ✓ | ✓ |
+| `\begin{matrix}` | ✓ | — |
+| `\begin{matrix*}` | ✓ | — |
+| `\begin{multline} **[W]**` | — | ✓ |
+| `\begin{pmatrix}` | ✓ | ✓ |
+| `\begin{pmatrix*}` | ✓ | — |
+| `\begin{rcases}` | ✓ | — |
+| `\begin{smallmatrix}` | ✓ | ✓ |
+| `\begin{smallmatrix*}` | ✓ | — |
+| `\begin{split}` | ✓ | ✓ |
+| `\begin{subarray}` | ✓ | — |
+| `\begin{vmatrix}` | ✓ | ✓ |
+| `\begin{vmatrix*}` | ✓ | — |
 
 ## WASM 专属命令（KaTeX 不认识，混用会整条 SVG 化）
 
@@ -80,27 +88,27 @@
 
 ## KaTeX 层全量命令（1020 个，去内部命令）
 
-**结构**（55）：`\accentset` `\binom` `\bra` `\Bra` `\braket` `\Braket` `\cfrac` `\dbinom` `\dfrac` `\frac` `\genfrac` `\intertext` `\joinrel` `\Ket` `\ket` `\longdiv` `\mathbin` `\mathchoice` `\mathclose` `\mathinner` `\mathop` `\mathopen` `\mathord` `\mathpunct` `\mathrel` `\overbrace` `\overparen` `\overset` `\prescript` `\Set` `\set` `\sfrac` `\shoveleft` `\shoveright` `\sideset` `\spbreve` `\spcheck` `\spddot` `\spdot` `\sphat` `\sptilde` `\sqrt` `\stackbin` `\stackrel` `\substack` `\tbinom` `\tfrac` `\underaccent` `\underbrace` `\underparen` `\underset` `\undertilde` `\xleftarrow` `\xleftrightarrow` `\xrightarrow`
+**结构**（55）：`\accentset` `\binom` `\Bra` `\bra` `\braket` `\Braket` `\cfrac` `\dbinom` `\dfrac` `\frac` `\genfrac` `\intertext` `\joinrel` `\Ket` `\ket` `\longdiv` `\mathbin` `\mathchoice` `\mathclose` `\mathinner` `\mathop` `\mathopen` `\mathord` `\mathpunct` `\mathrel` `\overbrace` `\overparen` `\overset` `\prescript` `\Set` `\set` `\sfrac` `\shoveleft` `\shoveright` `\sideset` `\spbreve` `\spcheck` `\spddot` `\spdot` `\sphat` `\sptilde` `\sqrt` `\stackbin` `\stackrel` `\substack` `\tbinom` `\tfrac` `\underaccent` `\underbrace` `\underparen` `\underset` `\undertilde` `\xleftarrow` `\xleftrightarrow` `\xrightarrow`
 
-**希腊字母**（66）：`\Alpha` `\alpha` `\beta` `\Beta` `\chi` `\Chi` `\Delta` `\delta` `\digamma` `\epsilon` `\Epsilon` `\eta` `\Eta` `\gamma` `\Gamma` `\Iota` `\iota` `\kappa` `\Kappa` `\Lambda` `\lambda` `\mu` `\Mu` `\Nu` `\nu` `\Omega` `\omega` `\Phi` `\phi` `\Pi` `\pi` `\psi` `\Psi` `\Rho` `\rho` `\Sigma` `\sigma` `\tau` `\Tau` `\theta` `\Theta` `\thetasym` `\Upsilon` `\upsilon` `\varDelta` `\varepsilon` `\varGamma` `\varkappa` `\varLambda` `\varOmega` `\varPhi` `\varphi` `\varPi` `\varpi` `\varPsi` `\varrho` `\varsigma` `\varSigma` `\vartheta` `\varTheta` `\varUpsilon` `\varXi` `\Xi` `\xi` `\Zeta` `\zeta`
+**希腊字母**（66）：`\alpha` `\Alpha` `\beta` `\Beta` `\Chi` `\chi` `\Delta` `\delta` `\digamma` `\Epsilon` `\epsilon` `\Eta` `\eta` `\gamma` `\Gamma` `\Iota` `\iota` `\Kappa` `\kappa` `\Lambda` `\lambda` `\mu` `\Mu` `\Nu` `\nu` `\Omega` `\omega` `\phi` `\Phi` `\pi` `\Pi` `\psi` `\Psi` `\Rho` `\rho` `\Sigma` `\sigma` `\tau` `\Tau` `\Theta` `\theta` `\thetasym` `\upsilon` `\Upsilon` `\varDelta` `\varepsilon` `\varGamma` `\varkappa` `\varLambda` `\varOmega` `\varPhi` `\varphi` `\varPi` `\varpi` `\varPsi` `\varrho` `\varSigma` `\varsigma` `\vartheta` `\varTheta` `\varUpsilon` `\varXi` `\Xi` `\xi` `\Zeta` `\zeta`
 
 **函数与算子**（58）：`\arccos` `\arccot` `\arccsc` `\arcctg` `\arcsec` `\arcsin` `\arctan` `\arctg` `\arg` `\argmax` `\argmin` `\bmod` `\cos` `\cosec` `\cosh` `\cot` `\cotg` `\coth` `\csc` `\csch` `\ctg` `\cth` `\DeclareMathOperator` `\DeclareMathSizes` `\deg` `\det` `\dim` `\exp` `\gcd` `\hom` `\inf` `\injlim` `\ker` `\lg` `\lim` `\liminf` `\limsup` `\ln` `\log` `\max` `\min` `\mod` `\operatorname` `\plim` `\pmod` `\Pr` `\projlim` `\sec` `\sech` `\sin` `\sinh` `\sup` `\tanh` `\tg` `\th` `\varinjlim` `\varliminf` `\varprojlim`
 
 **大型运算符**（22）：`\bigcap` `\bigcup` `\bigodot` `\bigoplus` `\bigotimes` `\bigsqcup` `\biguplus` `\bigvee` `\bigwedge` `\coprod` `\idotsint` `\iiiint` `\iiint` `\iint` `\int` `\intop` `\oiiint` `\oiint` `\oint` `\prod` `\smallint` `\sum`
 
-**箭头**（125）：`\cdleftarrow` `\cdrightarrow` `\circlearrowleft` `\circlearrowright` `\curvearrowleft` `\curvearrowright` `\Darr` `\dArr` `\darr` `\dashleftarrow` `\dashrightarrow` `\Downarrow` `\downarrow` `\downdownarrows` `\downharpoonleft` `\downharpoonright` `\gets` `\harr` `\hArr` `\Harr` `\hookleftarrow` `\hookrightarrow` `\iff` `\impliedby` `\implies` `\Larr` `\lArr` `\larr` `\leadsto` `\Leftarrow` `\leftarrow` `\leftarrowtail` `\leftharpoondown` `\leftharpoonup` `\leftleftarrows` `\leftrightarrow` `\Leftrightarrow` `\leftrightarrows` `\leftrightharpoons` `\leftrightsquigarrow` `\Lleftarrow` `\longleftarrow` `\Longleftarrow` `\Longleftrightarrow` `\longleftrightarrow` `\Longmapsfrom` `\longmapsfrom` `\Longmapsto` `\longmapsto` `\Longrightarrow` `\longrightarrow` `\looparrowleft` `\looparrowright` `\lrArr` `\Lrarr` `\lrarr` `\Lsh` `\Mapsfrom` `\Mapsto` `\mapsto` `\models` `\nearrow` `\nLeftarrow` `\nleftarrow` `\nLeftrightarrow` `\nleftrightarrow` `\nRightarrow` `\nrightarrow` `\nwarrow` `\overleftarrow` `\overleftharpoon` `\overleftrightarrow` `\Overrightarrow` `\overrightarrow` `\overrightharpoon` `\Rarr` `\rarr` `\rArr` `\relbar` `\Relbar` `\rightarrow` `\Rightarrow` `\rightarrowtail` `\rightharpoondown` `\rightharpoonup` `\rightleftarrows` `\rightleftharpoons` `\rightrightarrows` `\rightsquigarrow` `\Rrightarrow` `\Rsh` `\searrow` `\swarrow` `\to` `\twoheadleftarrow` `\twoheadrightarrow` `\Uarr` `\uArr` `\uarr` `\underleftarrow` `\underleftrightarrow` `\underrightarrow` `\uparrow` `\Uparrow` `\Updownarrow` `\updownarrow` `\upharpoonleft` `\upharpoonright` `\upuparrows` `\xhookleftarrow` `\xhookrightarrow` `\xLeftarrow` `\xleftharpoondown` `\xleftharpoonup` `\xLeftrightarrow` `\xleftrightharpoons` `\xmapsto` `\xRightarrow` `\xrightharpoondown` `\xrightharpoonup` `\xrightleftarrows` `\xrightleftharpoons` `\xtofrom` `\xtwoheadleftarrow` `\xtwoheadrightarrow`
+**箭头**（125）：`\cdleftarrow` `\cdrightarrow` `\circlearrowleft` `\circlearrowright` `\curvearrowleft` `\curvearrowright` `\Darr` `\darr` `\dArr` `\dashleftarrow` `\dashrightarrow` `\downarrow` `\Downarrow` `\downdownarrows` `\downharpoonleft` `\downharpoonright` `\gets` `\hArr` `\Harr` `\harr` `\hookleftarrow` `\hookrightarrow` `\iff` `\impliedby` `\implies` `\Larr` `\lArr` `\larr` `\leadsto` `\Leftarrow` `\leftarrow` `\leftarrowtail` `\leftharpoondown` `\leftharpoonup` `\leftleftarrows` `\Leftrightarrow` `\leftrightarrow` `\leftrightarrows` `\leftrightharpoons` `\leftrightsquigarrow` `\Lleftarrow` `\Longleftarrow` `\longleftarrow` `\longleftrightarrow` `\Longleftrightarrow` `\longmapsfrom` `\Longmapsfrom` `\Longmapsto` `\longmapsto` `\Longrightarrow` `\longrightarrow` `\looparrowleft` `\looparrowright` `\Lrarr` `\lrarr` `\lrArr` `\Lsh` `\Mapsfrom` `\Mapsto` `\mapsto` `\models` `\nearrow` `\nleftarrow` `\nLeftarrow` `\nLeftrightarrow` `\nleftrightarrow` `\nrightarrow` `\nRightarrow` `\nwarrow` `\overleftarrow` `\overleftharpoon` `\overleftrightarrow` `\overrightarrow` `\Overrightarrow` `\overrightharpoon` `\rarr` `\rArr` `\Rarr` `\Relbar` `\relbar` `\Rightarrow` `\rightarrow` `\rightarrowtail` `\rightharpoondown` `\rightharpoonup` `\rightleftarrows` `\rightleftharpoons` `\rightrightarrows` `\rightsquigarrow` `\Rrightarrow` `\Rsh` `\searrow` `\swarrow` `\to` `\twoheadleftarrow` `\twoheadrightarrow` `\Uarr` `\uarr` `\uArr` `\underleftarrow` `\underleftrightarrow` `\underrightarrow` `\Uparrow` `\uparrow` `\Updownarrow` `\updownarrow` `\upharpoonleft` `\upharpoonright` `\upuparrows` `\xhookleftarrow` `\xhookrightarrow` `\xLeftarrow` `\xleftharpoondown` `\xleftharpoonup` `\xLeftrightarrow` `\xleftrightharpoons` `\xmapsto` `\xRightarrow` `\xrightharpoondown` `\xrightharpoonup` `\xrightleftarrows` `\xrightleftharpoons` `\xtofrom` `\xtwoheadleftarrow` `\xtwoheadrightarrow`
 
-**关系符**（198）：`\approx` `\approxcolon` `\approxcoloncolon` `\approxeq` `\asymp` `\backepsilon` `\backsim` `\backsimeq` `\because` `\between` `\bowtie` `\bumpeq` `\Bumpeq` `\cdlongequal` `\circeq` `\colon` `\colonapprox` `\Colonapprox` `\coloncolon` `\coloncolonapprox` `\coloncolonequals` `\coloncolonminus` `\coloncolonsim` `\Coloneq` `\coloneq` `\coloneqq` `\Coloneqq` `\colonequals` `\colonminus` `\colonsim` `\Colonsim` `\cong` `\curlyeqprec` `\curlyeqsucc` `\dashv` `\dblcolon` `\doteq` `\Doteq` `\doteqdot` `\eqcirc` `\eqcolon` `\Eqcolon` `\Eqqcolon` `\eqqcolon` `\eqsim` `\eqslantgtr` `\eqslantless` `\equalscolon` `\equalscoloncolon` `\equiv` `\fallingdotseq` `\frown` `\ge` `\geq` `\geqq` `\geqslant` `\gg` `\ggg` `\gggtr` `\gnapprox` `\gneq` `\gneqq` `\gnsim` `\gt` `\gtrapprox` `\gtrdot` `\gtreqless` `\gtreqqless` `\gtrless` `\gtrsim` `\gvertneqq` `\in` `\isin` `\le` `\leq` `\leqq` `\leqslant` `\lessapprox` `\lessdot` `\lesseqgtr` `\lesseqqgtr` `\lessgtr` `\lesssim` `\ll` `\lll` `\llless` `\lnapprox` `\lneq` `\lneqq` `\lnsim` `\lt` `\lvertneqq` `\mid` `\minuscolon` `\minuscoloncolon` `\ncong` `\ne` `\neq` `\ngeq` `\ngeqq` `\ngeqslant` `\ngtr` `\ni` `\nleq` `\nleqq` `\nleqslant` `\nless` `\nmid` `\notin` `\notni` `\nparallel` `\nprec` `\npreceq` `\nshortparallel` `\nsim` `\nsubseteq` `\nsubseteqq` `\nsucc` `\nsucceq` `\nsupseteq` `\nsupseteqq` `\ntriangleleft` `\ntrianglelefteq` `\ntriangleright` `\ntrianglerighteq` `\nvDash` `\nVDash` `\nvdash` `\nVdash` `\ordinarycolon` `\owns` `\parallel` `\perp` `\pitchfork` `\prec` `\precapprox` `\preccurlyeq` `\preceq` `\precnapprox` `\precneqq` `\precnsim` `\precsim` `\propto` `\questeq` `\risingdotseq` `\shortmid` `\shortparallel` `\sim` `\simcolon` `\simcoloncolon` `\simeq` `\smallfrown` `\smallsmile` `\smile` `\sqsubset` `\sqsubseteq` `\sqsupset` `\sqsupseteq` `\subset` `\subseteq` `\subseteqq` `\subsetneq` `\subsetneqq` `\succ` `\succapprox` `\succcurlyeq` `\succeq` `\succnapprox` `\succneqq` `\succnsim` `\succsim` `\supset` `\supseteq` `\supseteqq` `\supsetneq` `\supsetneqq` `\therefore` `\thickapprox` `\thicksim` `\trianglelefteq` `\triangleq` `\trianglerighteq` `\varpropto` `\varsubsetneq` `\varsubsetneqq` `\varsupsetneq` `\varsupsetneqq` `\vartriangle` `\vartriangleleft` `\vartriangleright` `\vcentcolon` `\vdash` `\vDash` `\Vdash` `\Vvdash` `\xleftequilibrium` `\xlongequal` `\xrightequilibrium`
+**关系符**（198）：`\approx` `\approxcolon` `\approxcoloncolon` `\approxeq` `\asymp` `\backepsilon` `\backsim` `\backsimeq` `\because` `\between` `\bowtie` `\Bumpeq` `\bumpeq` `\cdlongequal` `\circeq` `\colon` `\Colonapprox` `\colonapprox` `\coloncolon` `\coloncolonapprox` `\coloncolonequals` `\coloncolonminus` `\coloncolonsim` `\coloneq` `\Coloneq` `\Coloneqq` `\coloneqq` `\colonequals` `\colonminus` `\colonsim` `\Colonsim` `\cong` `\curlyeqprec` `\curlyeqsucc` `\dashv` `\dblcolon` `\Doteq` `\doteq` `\doteqdot` `\eqcirc` `\Eqcolon` `\eqcolon` `\eqqcolon` `\Eqqcolon` `\eqsim` `\eqslantgtr` `\eqslantless` `\equalscolon` `\equalscoloncolon` `\equiv` `\fallingdotseq` `\frown` `\ge` `\geq` `\geqq` `\geqslant` `\gg` `\ggg` `\gggtr` `\gnapprox` `\gneq` `\gneqq` `\gnsim` `\gt` `\gtrapprox` `\gtrdot` `\gtreqless` `\gtreqqless` `\gtrless` `\gtrsim` `\gvertneqq` `\in` `\isin` `\le` `\leq` `\leqq` `\leqslant` `\lessapprox` `\lessdot` `\lesseqgtr` `\lesseqqgtr` `\lessgtr` `\lesssim` `\ll` `\lll` `\llless` `\lnapprox` `\lneq` `\lneqq` `\lnsim` `\lt` `\lvertneqq` `\mid` `\minuscolon` `\minuscoloncolon` `\ncong` `\ne` `\neq` `\ngeq` `\ngeqq` `\ngeqslant` `\ngtr` `\ni` `\nleq` `\nleqq` `\nleqslant` `\nless` `\nmid` `\notin` `\notni` `\nparallel` `\nprec` `\npreceq` `\nshortparallel` `\nsim` `\nsubseteq` `\nsubseteqq` `\nsucc` `\nsucceq` `\nsupseteq` `\nsupseteqq` `\ntriangleleft` `\ntrianglelefteq` `\ntriangleright` `\ntrianglerighteq` `\nVDash` `\nVdash` `\nvDash` `\nvdash` `\ordinarycolon` `\owns` `\parallel` `\perp` `\pitchfork` `\prec` `\precapprox` `\preccurlyeq` `\preceq` `\precnapprox` `\precneqq` `\precnsim` `\precsim` `\propto` `\questeq` `\risingdotseq` `\shortmid` `\shortparallel` `\sim` `\simcolon` `\simcoloncolon` `\simeq` `\smallfrown` `\smallsmile` `\smile` `\sqsubset` `\sqsubseteq` `\sqsupset` `\sqsupseteq` `\subset` `\subseteq` `\subseteqq` `\subsetneq` `\subsetneqq` `\succ` `\succapprox` `\succcurlyeq` `\succeq` `\succnapprox` `\succneqq` `\succnsim` `\succsim` `\supset` `\supseteq` `\supseteqq` `\supsetneq` `\supsetneqq` `\therefore` `\thickapprox` `\thicksim` `\trianglelefteq` `\triangleq` `\trianglerighteq` `\varpropto` `\varsubsetneq` `\varsubsetneqq` `\varsupsetneq` `\varsupsetneqq` `\vartriangle` `\vartriangleleft` `\vartriangleright` `\vcentcolon` `\Vdash` `\vDash` `\vdash` `\Vvdash` `\xleftequilibrium` `\xlongequal` `\xrightequilibrium`
 
-**二元运算符**（55）：`\amalg` `\And` `\ast` `\barwedge` `\bigtriangledown` `\bigtriangleup` `\boxdot` `\boxminus` `\boxplus` `\boxtimes` `\bullet` `\Cap` `\cap` `\cdot` `\centerdot` `\circ` `\circledast` `\circledcirc` `\circleddash` `\cup` `\Cup` `\dagger` `\diamond` `\div` `\divideontimes` `\dotplus` `\doublecap` `\doublecup` `\intercal` `\lhd` `\ltimes` `\mp` `\odot` `\ominus` `\oplus` `\oslash` `\otimes` `\pm` `\rhd` `\rtimes` `\setminus` `\smallsetminus` `\sqcap` `\sqcup` `\star` `\times` `\triangleleft` `\triangleright` `\unlhd` `\unrhd` `\uplus` `\vee` `\veebar` `\wedge` `\wr`
+**二元运算符**（55）：`\amalg` `\And` `\ast` `\barwedge` `\bigtriangledown` `\bigtriangleup` `\boxdot` `\boxminus` `\boxplus` `\boxtimes` `\bullet` `\Cap` `\cap` `\cdot` `\centerdot` `\circ` `\circledast` `\circledcirc` `\circleddash` `\Cup` `\cup` `\dagger` `\diamond` `\div` `\divideontimes` `\dotplus` `\doublecap` `\doublecup` `\intercal` `\lhd` `\ltimes` `\mp` `\odot` `\ominus` `\oplus` `\oslash` `\otimes` `\pm` `\rhd` `\rtimes` `\setminus` `\smallsetminus` `\sqcap` `\sqcup` `\star` `\times` `\triangleleft` `\triangleright` `\unlhd` `\unrhd` `\uplus` `\vee` `\veebar` `\wedge` `\wr`
 
-**定界符**（59）：`\angl` `\angln` `\Arrowvert` `\arrowvert` `\backslash` `\bangle` `\big` `\Big` `\bigg` `\Bigg` `\biggl` `\Biggl` `\Biggm` `\biggm` `\Biggr` `\biggr` `\bigl` `\Bigl` `\Bigm` `\bigm` `\Bigr` `\bigr` `\brace` `\brack` `\lang` `\langle` `\lbrace` `\lBrace` `\lbrack` `\lceil` `\left` `\lfloor` `\lgroup` `\llbracket` `\llcorner` `\lmoustache` `\lparen` `\lrcorner` `\lVert` `\lvert` `\middle` `\rang` `\rangle` `\rBrace` `\rbrace` `\rbrack` `\rceil` `\rfloor` `\rgroup` `\right` `\rmoustache` `\rparen` `\rrbracket` `\rvert` `\rVert` `\ulcorner` `\urcorner` `\vert` `\Vert`
+**定界符**（59）：`\angl` `\angln` `\Arrowvert` `\arrowvert` `\backslash` `\bangle` `\Big` `\big` `\bigg` `\Bigg` `\biggl` `\Biggl` `\biggm` `\Biggm` `\biggr` `\Biggr` `\bigl` `\Bigl` `\Bigm` `\bigm` `\bigr` `\Bigr` `\brace` `\brack` `\lang` `\langle` `\lbrace` `\lBrace` `\lbrack` `\lceil` `\left` `\lfloor` `\lgroup` `\llbracket` `\llcorner` `\lmoustache` `\lparen` `\lrcorner` `\lvert` `\lVert` `\middle` `\rang` `\rangle` `\rbrace` `\rBrace` `\rbrack` `\rceil` `\rfloor` `\rgroup` `\right` `\rmoustache` `\rparen` `\rrbracket` `\rvert` `\rVert` `\ulcorner` `\urcorner` `\vert` `\Vert`
 
 **重音与装饰**（53）：`\acute` `\backprime` `\bar` `\bcancel` `\breve` `\cancel` `\cdotp` `\cdots` `\check` `\clap` `\ddot` `\ddots` `\dot` `\dotminus` `\dots` `\dotsb` `\dotsc` `\dotsi` `\dotsm` `\dotso` `\grave` `\hat` `\iddots` `\ldotp` `\ldots` `\llap` `\mathclap` `\mathllap` `\mathring` `\mathrlap` `\overbrack` `\overgroup` `\overline` `\overlinesegment` `\prime` `\rlap` `\sdot` `\sout` `\tilde` `\tripledash` `\underbar` `\underbrack` `\undergroup` `\underline` `\underlinesegment` `\utilde` `\varvdots` `\vdots` `\vec` `\widecheck` `\widehat` `\widetilde` `\xcancel`
 
 **字体与文本**（37）：`\Bbb` `\Bbbk` `\bf` `\bm` `\bold` `\boldsymbol` `\cal` `\emph` `\frak` `\it` `\mathbb` `\mathbf` `\mathcal` `\mathds` `\mathellipsis` `\mathfrak` `\mathit` `\mathnormal` `\mathrm` `\mathscr` `\mathsf` `\mathsfit` `\mathsterling` `\mathtt` `\oldstylenums` `\rm` `\sf` `\text` `\textbf` `\textit` `\textmd` `\textnormal` `\textrm` `\textsf` `\texttt` `\textup` `\tt`
 
-**文本符号**（52）：`\AA` `\aa` `\AE` `\ae` `\c` `\H` `\i` `\j` `\lq` `\N` `\o` `\O` `\OE` `\oe` `\P` `\R` `\r` `\rq` `\S` `\ss` `\textasciicircum` `\textasciitilde` `\textbackslash` `\textbar` `\textbardbl` `\textbraceleft` `\textbraceright` `\textcircled` `\textcolor` `\textcopyright` `\textdagger` `\textdaggerdbl` `\textdegree` `\textdollar` `\textellipsis` `\textemdash` `\textendash` `\textgreater` `\textless` `\textquotedblleft` `\textquotedblright` `\textquoteleft` `\textquoteright` `\textregistered` `\textsterling` `\textstyle` `\textsubscript` `\textsuperscript` `\textunderscore` `\u` `\v` `\Z`
+**文本符号**（52）：`\aa` `\AA` `\ae` `\AE` `\c` `\H` `\i` `\j` `\lq` `\N` `\o` `\O` `\oe` `\OE` `\P` `\R` `\r` `\rq` `\S` `\ss` `\textasciicircum` `\textasciitilde` `\textbackslash` `\textbar` `\textbardbl` `\textbraceleft` `\textbraceright` `\textcircled` `\textcolor` `\textcopyright` `\textdagger` `\textdaggerdbl` `\textdegree` `\textdollar` `\textellipsis` `\textemdash` `\textendash` `\textgreater` `\textless` `\textquotedblleft` `\textquotedblright` `\textquoteleft` `\textquoteright` `\textregistered` `\textsterling` `\textstyle` `\textsubscript` `\textsuperscript` `\textunderscore` `\u` `\v` `\Z`
 
 **颜色**（6）：`\bgcolor` `\color` `\colorbox` `\definecolor` `\fcolorbox` `\fgcolor`
 
@@ -112,13 +120,13 @@
 
 **表格 (WASM)**（13）：`\arrayrulecolor` `\arraystretch` `\cellcolor` `\columncolor` `\cornersize` `\hdots` `\hdotsfor` `\hline` `\multicolumn` `\multirow` `\newcolumntype` `\rowcolor` `\tabular`
 
-**显示样式**（14）：`\displaystyle` `\footnotesize` `\Huge` `\huge` `\LARGE` `\Large` `\large` `\normalsize` `\scriptscriptstyle` `\scriptsize` `\scriptstyle` `\sixptsize` `\small` `\tiny`
+**显示样式**（14）：`\displaystyle` `\footnotesize` `\huge` `\Huge` `\Large` `\large` `\LARGE` `\normalsize` `\scriptscriptstyle` `\scriptsize` `\scriptstyle` `\sixptsize` `\small` `\tiny`
 
 **TeX 原语与语法**（52）：`\above` `\abovewithdelims` `\atop` `\atopwithdelims` `\begin` `\begingroup` `\bgroup` `\breakEverywhere` `\char` `\choose` `\def` `\edef` `\egroup` `\end` `\endgroup` `\errmessage` `\expandafter` `\fatalIfCmdConflict` `\futurelet` `\gdef` `\global` `\hbox` `\href` `\htmlClass` `\htmlData` `\htmlId` `\htmlStyle` `\let` `\limits` `\magnification` `\makeatletter` `\makeatother` `\message` `\newcommand` `\nobreak` `\noexpand` `\nolimits` `\nonumber` `\notag` `\over` `\overwithdelims` `\providecommand` `\relax` `\renewcommand` `\renewenvironment` `\show` `\tag` `\TextOrMath` `\url` `\vcenter` `\verb` `\xdef`
 
-**杂项符号**（114）：`\alef` `\alefsym` `\aleph` `\angle` `\beth` `\bigcirc` `\bigstar` `\blacklozenge` `\blacksquare` `\blacktriangle` `\blacktriangledown` `\blacktriangleleft` `\blacktriangleright` `\block` `\bot` `\Box` `\bull` `\checkmark` `\clubs` `\clubsuit` `\cnums` `\complement` `\Complex` `\copyright` `\curlyvee` `\curlywedge` `\dag` `\Dagger` `\daleth` `\ddag` `\ddagger` `\ddddot` `\dddot` `\diagdown` `\diagup` `\Diamond` `\diamonds` `\diamondsuit` `\DOTSB` `\DOTSI` `\DOTSX` `\dotsx` `\doublebarwedge` `\ell` `\empty` `\emptyset` `\eth` `\exist` `\exists` `\Finv` `\flat` `\forall` `\Game` `\gimel` `\greek` `\hbar` `\hearts` `\heartsuit` `\hslash` `\hybull` `\Im` `\image` `\imageof` `\imath` `\infin` `\infty` `\jmath` `\Join` `\KaTeX` `\land` `\LaTeX` `\lhblk` `\lnot` `\lor` `\maltese` `\marker` `\measuredangle` `\mho` `\micro` `\minuso` `\multimap` `\nabla` `\natnums` `\natural` `\neg` `\nexists` `\origin` `\origof` `\partial` `\phase` `\plusmn` `\pmb` `\pod` `\pounds` `\ratio` `\Re` `\real` `\Reals` `\sect` `\sharp` `\spades` `\spadesuit` `\sphericalangle` `\sqrtsign` `\surd` `\TeX` `\top` `\triangle` `\triangledown` `\uhblk` `\varnothing` `\weierp` `\wp` `\yen`
+**杂项符号**（114）：`\alef` `\alefsym` `\aleph` `\angle` `\beth` `\bigcirc` `\bigstar` `\blacklozenge` `\blacksquare` `\blacktriangle` `\blacktriangledown` `\blacktriangleleft` `\blacktriangleright` `\block` `\bot` `\Box` `\bull` `\checkmark` `\clubs` `\clubsuit` `\cnums` `\complement` `\Complex` `\copyright` `\curlyvee` `\curlywedge` `\dag` `\Dagger` `\daleth` `\ddag` `\ddagger` `\ddddot` `\dddot` `\diagdown` `\diagup` `\Diamond` `\diamonds` `\diamondsuit` `\DOTSB` `\DOTSI` `\dotsx` `\DOTSX` `\doublebarwedge` `\ell` `\empty` `\emptyset` `\eth` `\exist` `\exists` `\Finv` `\flat` `\forall` `\Game` `\gimel` `\greek` `\hbar` `\hearts` `\heartsuit` `\hslash` `\hybull` `\Im` `\image` `\imageof` `\imath` `\infin` `\infty` `\jmath` `\Join` `\KaTeX` `\land` `\LaTeX` `\lhblk` `\lnot` `\lor` `\maltese` `\marker` `\measuredangle` `\mho` `\micro` `\minuso` `\multimap` `\nabla` `\natnums` `\natural` `\neg` `\nexists` `\origin` `\origof` `\partial` `\phase` `\plusmn` `\pmb` `\pod` `\pounds` `\ratio` `\Re` `\real` `\Reals` `\sect` `\sharp` `\spades` `\spadesuit` `\sphericalangle` `\sqrtsign` `\surd` `\TeX` `\top` `\triangle` `\triangledown` `\uhblk` `\varnothing` `\weierp` `\wp` `\yen`
 
-**其他**（40）：`\Android` `\AndroidTeX` `\boxed` `\ca` `\ce` `\celsius` `\ch` `\circledR` `\circledS` `\degree` `\hdashline` `\hermitmatrix` `\leftthreetimes` `\long` `\lozenge` `\not` `\nshortmid` `\omicron` `\Omicron` `\operatornamewithlimits` `\pica` `\pix` `\pixel` `\pu` `\reals` `\restriction` `\rightthreetimes` `\Roman` `\roman` `\rule` `\sh` `\square` `\sub` `\sube` `\Subset` `\supe` `\Supset` `\underscore` `\varlimsup` `\x`
+**其他**（40）：`\Android` `\AndroidTeX` `\boxed` `\ca` `\ce` `\celsius` `\ch` `\circledR` `\circledS` `\degree` `\hdashline` `\hermitmatrix` `\leftthreetimes` `\long` `\lozenge` `\not` `\nshortmid` `\Omicron` `\omicron` `\operatornamewithlimits` `\pica` `\pix` `\pixel` `\pu` `\reals` `\restriction` `\rightthreetimes` `\roman` `\Roman` `\rule` `\sh` `\square` `\sub` `\sube` `\Subset` `\supe` `\Supset` `\underscore` `\varlimsup` `\x`
 
 ## 彩蛋提示
 
