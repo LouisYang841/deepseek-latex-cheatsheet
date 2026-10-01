@@ -26,6 +26,8 @@
 
 **③ 零散残缺**——`\hfill` 非数学模式单用（用 array 的 `l`/`r` 列替代）；`\hdashline`（用 `\hline` 或 `\cline` 替代）；`\definecolor` 的 HTML 模式（用 rgb 浮点数或内置 dvips 色名替代）；同条公式内 `\definecolor` 后立即 `\bgcolor`（分块定义再调用）。
 
+**④ 扫到但失效**——\rowcolor \cellcolor \columncolor 在 WASM 二进制里有字符串，但实测全崩（含 [rgb] [HTML] 各种语法变体、基础色名 red/black 均死）。着色一律改用 \colorbox。属构建版本差异，静态分析无法区分。
+
 ## ✅ 黄金开发规范
 
 - **WASM 层管排版 UI**：`\ovalbox`（胶囊）`\shadowbox`（阴影）`\doublebox`（双线框）`\rotatebox`（旋转）`\scalebox`（缩放）`\reflectbox`（镜像）
